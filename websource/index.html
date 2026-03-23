@@ -214,7 +214,7 @@
                 <div class="glass-card p-2 mb-4">
                     <div class="input-group">
                         <span class="input-group-text bg-transparent border-0 text-white opacity-50"><i class="bi bi-search"></i></span>
-                        <input type="text" id="searchInput" class="form-control bg-transparent border-0" placeholder="Tìm bài hát của Oanh..." oninput="filterSongs()">
+                        <input type="text" id="searchInput" class="form-control bg-transparent border-0" placeholder="Tìm bài hát của Oanh..." oninput="filtersong()">
                     </div>
                 </div>
 
@@ -263,7 +263,7 @@
             document.getElementById('daysCount').innerText = diffDays;
         }
 
-        let allSongs = [];
+        let allsong = [];
 
         function updateFileName() {
             const fileInput = document.getElementById('pdfFile');
@@ -273,16 +273,16 @@
             }
         }
 
-        async function loadSongs() {
-            const { data } = await _supabase.from('songs').select('*').order('created_at', { ascending: false });
-            allSongs = data || [];
-            renderList(allSongs);
+        async function loadsong() {
+            const { data } = await _supabase.from('song').select('*').order('created_at', { ascending: false });
+            allsong = data || [];
+            renderList(allsong);
         }
 
-        function renderList(songs) {
+        function renderList(song) {
             const list = document.getElementById('musicList');
-            if (songs.length === 0) { list.innerHTML = `<div class="text-center opacity-50 mt-5">Chưa có bản nhạc nào hết á...</div>`; return; }
-            list.innerHTML = songs.map(song => `
+            if (song.length === 0) { list.innerHTML = `<div class="text-center opacity-50 mt-5">Chưa có bản nhạc nào hết á...</div>`; return; }
+            list.innerHTML = song.map(song => `
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     <a href="${song.pdf_url}" target="_blank" class="song-link"><i class="bi bi-music-note-beamed me-2 text-danger"></i> ${song.title}</a>
                     <i class="bi bi-trash3 delete-icon" onclick="deleteSong(${song.id}, '${song.pdf_url}')"></i>
@@ -290,9 +290,9 @@
             `).join('');
         }
 
-        function filterSongs() {
+        function filtersong() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            renderList(allSongs.filter(s => s.title.toLowerCase().includes(query)));
+            renderList(allsong.filter(s => s.title.toLowerCase().includes(query)));
         }
 
         async function uploadSong() {
@@ -305,7 +305,7 @@
             const { data: uploadData } = await _supabase.storage.from('pdfs').upload(fileName, file);
             if (uploadData) {
                 const { data: urlData } = _supabase.storage.from('pdfs').getPublicUrl(fileName);
-                await _supabase.from('songs').insert([{ title, pdf_url: urlData.publicUrl }]);
+                await _supabase.from('song').insert([{ title, pdf_url: urlData.publicUrl }]);
                 location.reload();
             }
         }
@@ -314,12 +314,12 @@
             if (!confirm('Xóa bản nhạc này không bé yêu? 🥺')) return;
             const fileName = url.split('/').pop();
             await _supabase.storage.from('pdfs').remove([fileName]);
-            await _supabase.from('songs').delete().eq('id', id);
+            await _supabase.from('song').delete().eq('id', id);
             location.reload();
         }
 
         // Khởi chạy
-        loadSongs();
+        loadsong();
         calculateDatingDays();
     </script>
 </body>
