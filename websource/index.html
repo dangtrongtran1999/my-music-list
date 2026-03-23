@@ -8,7 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 
     <style>
         :root {
@@ -18,7 +21,6 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            /* Lớp phủ đen mờ + Hình nền background.jpg */
             background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('background.jpg');
             background-size: cover;
             background-position: center;
@@ -29,7 +31,6 @@
             margin: 0;
         }
 
-        /* Hiệu ứng kính mờ Glassmorphism */
         .glass-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(15px);
@@ -49,7 +50,6 @@
             margin: 40px 0;
         }
 
-        /* Dating Counter */
         .dating-container {
             display: flex;
             align-items: center;
@@ -117,7 +117,6 @@
             }
         }
 
-        /* Form & List */
         .form-control {
             background: rgba(255, 255, 255, 0.1) !important;
             border: 1px solid rgba(255, 255, 255, 0.2) !important;
@@ -138,7 +137,20 @@
                 transform: translateY(-2px);
             }
 
-        #pdfFile {
+        .btn-convert {
+            background: #00b4d8;
+            border: none;
+            font-weight: 600;
+            color: white;
+            transition: 0.3s;
+        }
+
+            .btn-convert:hover {
+                background: #0077b6;
+                transform: translateY(-2px);
+            }
+
+        #pdfFile, #imgToPdf {
             display: none;
         }
 
@@ -215,6 +227,24 @@
                     </div>
                 </div>
 
+                <div class="glass-card p-4 mb-4">
+                    <h5 class="mb-3"><i class="bi bi-magic me-2 text-info"></i>Gộp Ảnh (iPhone/Android) sang PDF</h5>
+                    <div class="row g-2 align-items-center">
+                        <div class="col-md-9">
+                            <label for="imgToPdf" class="custom-file-upload" id="imgLabel">
+                                <i class="bi bi-images me-1"></i> Chọn ảnh (JPG, PNG, HEIC...)
+                            </label>
+                            <input type="file" id="imgToPdf" accept="image/*,.heic,.HEIC" multiple onchange="updateImgLabel()">
+                        </div>
+                        <div class="col-md-3">
+                            <button id="btnConvert" class="btn btn-convert w-100 p-2" onclick="generatePDF()">
+                                <i class="bi bi-file-earmark-pdf-fill"></i> Gộp Ngay
+                            </button>
+                        </div>
+                    </div>
+                    <div id="pdfStatus" class="small mt-2 text-center opacity-75"></div>
+                </div>
+
                 <div class="glass-card p-2 mb-4">
                     <div class="input-group">
                         <span class="input-group-text bg-transparent border-0 text-white opacity-50"><i class="bi bi-search"></i></span>
@@ -234,13 +264,11 @@
                             <img src="dang.jpg" class="avatar" alt="Anh Đăng">
                             <div class="avatar-name">Anh Đăng</div>
                         </div>
-
                         <div class="counter-box text-center">
                             <div class="heart-icon"><i class="bi bi-heart-fill"></i></div>
                             <div id="daysCount" class="days-number">0</div>
                             <div style="font-size: 0.8rem; opacity: 0.6; letter-spacing: 2px; font-weight: 600;">NGÀY BÊN NHAU</div>
                         </div>
-
                         <div class="avatar-box">
                             <img src="oanh.jpg" class="avatar" alt="Bé Oanh">
                             <div class="avatar-name">Bé Oanh</div>
@@ -253,13 +281,11 @@
     </div>
 
     <script>
-        // THÔNG TIN SUPABASE
+        // CẤU HÌNH SUPABASE
         const _URL = 'https://vvmivjmgepmosdwkiagb.supabase.co';
         const _KEY = 'sb_publishable_f9No0YOA6vmNDJwdE_GG3w_gtKXbIcF';
         const _supabase = supabase.createClient(_URL, _KEY);
 
-        // Ngày hai bạn bắt đầu quen nhau (Đăng nhớ chỉnh lại cho chính xác nhen)
-        // Để ra con số 813 ngày như ảnh thì ngày bắt đầu khoảng: 31/12/2023
         const startDate = new Date('2024-05-21');
 
         function calculateDatingDays() {
@@ -272,40 +298,94 @@
         let allSongs = [];
 
         function updateFileName() {
-            const fileInput = document.getElementById('pdfFile');
-            const fileLabel = document.getElementById('fileLabel');
-            if (fileInput.files.length > 0) {
-                fileLabel.innerHTML = `<i class="bi bi-check2-circle text-success"></i> ${fileInput.files[0].name}`;
+            const input = document.getElementById('pdfFile');
+            const label = document.getElementById('fileLabel');
+            if (input.files.length > 0) label.innerHTML = `<i class="bi bi-check2-circle text-success"></i> ${input.files[0].name}`;
+        }
+
+        function updateImgLabel() {
+            const input = document.getElementById('imgToPdf');
+            const label = document.getElementById('imgLabel');
+            if (input.files.length > 0) label.innerHTML = `<i class="bi bi-check-all text-success"></i> Đã chọn ${input.files.length} ảnh`;
+        }
+
+        // --- XỬ LÝ CHUYỂN ĐỔI PDF (BAO GỒM HEIC) ---
+        async function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const input = document.getElementById('imgToPdf');
+            const status = document.getElementById('pdfStatus');
+            const btn = document.getElementById('btnConvert');
+
+            if (input.files.length === 0) return alert('Oanh ơi, chọn ảnh trước nhen! ❤️');
+
+            btn.disabled = true;
+            status.innerHTML = "Đang giải mã ảnh (HEIC có thể hơi lâu xíu)... ⏳";
+
+            const pdf = new jsPDF();
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+
+            try {
+                for (let i = 0; i < input.files.length; i++) {
+                    let file = input.files[i];
+
+                    // Kiểm tra nếu là file HEIC
+                    if (file.type === "image/heic" || file.name.toLowerCase().endsWith(".heic")) {
+                        status.innerHTML = `Đang chuyển đổi ảnh iPhone thứ ${i + 1}... 📱`;
+                        const convertedBlob = await heic2any({
+                            blob: file,
+                            toType: "image/jpeg",
+                            quality: 0.7
+                        });
+                        file = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+                    }
+
+                    const imgData = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.readAsDataURL(file);
+                    });
+
+                    if (i > 0) pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+                }
+
+                pdf.save(`Nhac_Oanh_${Date.now()}.pdf`);
+                status.innerHTML = "✅ Xong rồi! Oanh dùng file vừa tải về để upload nhen.";
+            } catch (err) {
+                console.error(err);
+                alert("Lỗi khi xử lý ảnh HEIC. Đăng kiểm tra console nhen!");
+                status.innerHTML = "❌ Lỗi xử lý.";
+            } finally {
+                btn.disabled = false;
             }
         }
 
-        // TẢI DANH SÁCH - Đã đổi thành bảng 'song' và cột 'ngay_tao'
+        // --- LOGIC SUPABASE ---
         async function loadSongs() {
             const { data, error } = await _supabase.from('song').select('*').order('ngay_tao', { ascending: false });
             if (error) {
-                console.error("Lỗi:", error);
-                document.getElementById('musicList').innerHTML = `<div class="text-center text-warning">Lỗi kết nối bảng 'song'. Kiểm tra RLS nhen Đăng!</div>`;
+                document.getElementById('musicList').innerHTML = `<div class="text-center text-warning">Lỗi RLS nhen Đăng!</div>`;
                 return;
             }
             allSongs = data || [];
             renderList(allSongs);
         }
 
-        // HIỂN THỊ - Đã đổi thành cột 'ten_nhac'
         function renderList(songs) {
             const list = document.getElementById('musicList');
             if (songs.length === 0) {
-                list.innerHTML = `<div class="text-center opacity-50 mt-5">Chưa có bản nhạc nào hết á... ❤️</div>`;
+                list.innerHTML = `<div class="text-center opacity-50 mt-5">Chưa có bản nhạc nào... ❤️</div>`;
                 return;
             }
             list.innerHTML = songs.map(song => `
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                    <a href="${song.pdf_url}" target="_blank" class="song-link">
-                        <i class="bi bi-music-note-beamed me-2 text-danger"></i> ${song.ten_nhac}
-                    </a>
-                    <i class="bi bi-trash3 delete-icon" onclick="deleteSong(${song.id}, '${song.pdf_url}')"></i>
-                </div>
-            `).join('');
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="${song.pdf_url}" target="_blank" class="song-link">
+                            <i class="bi bi-music-note-beamed me-2 text-danger"></i> ${song.ten_nhac}
+                        </a>
+                        <i class="bi bi-trash3 delete-icon" onclick="deleteSong(${song.id}, '${song.pdf_url}')"></i>
+                    </div>
+                `).join('');
         }
 
         function filterSongs() {
@@ -313,14 +393,12 @@
             renderList(allSongs.filter(s => s.ten_nhac.toLowerCase().includes(query)));
         }
 
-        // THÊM BÀI - Đã đổi thành bảng 'song' và cột 'ten_nhac'
         async function uploadSong() {
             const ten_nhac = document.getElementById('songTitle').value;
-            const fileInput = document.getElementById('pdfFile');
-            const file = fileInput.files[0];
+            const file = document.getElementById('pdfFile').files[0];
             const btn = document.querySelector('.btn-upload');
 
-            if (!ten_nhac || !file) return alert('Oanh ơi, nhập tên và chọn file nhen! ❤️');
+            if (!ten_nhac || !file) return alert('Nhập tên và chọn file PDF nhen! ❤️');
 
             btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
             btn.disabled = true;
@@ -330,22 +408,15 @@
 
             if (uploadData) {
                 const { data: urlData } = _supabase.storage.from('pdfs').getPublicUrl(fileName);
-                // Lưu vào DB với cột 'ten_nhac'
-                const { error: insError } = await _supabase.from('song').insert([{ ten_nhac: ten_nhac, pdf_url: urlData.publicUrl }]);
-
-                if (insError) {
-                    alert('Lỗi lưu Database: ' + insError.message);
-                } else {
-                    location.reload();
-                }
+                await _supabase.from('song').insert([{ ten_nhac: ten_nhac, pdf_url: urlData.publicUrl }]);
+                location.reload();
             } else {
-                alert('Lỗi Upload File: ' + upError.message);
+                alert('Lỗi: ' + upError.message);
                 btn.innerHTML = '<i class="bi bi-cloud-plus-fill"></i>';
                 btn.disabled = false;
             }
         }
 
-        // XÓA BÀI
         async function deleteSong(id, url) {
             if (!confirm('Xóa bản nhạc này không bé yêu? 🥺')) return;
             const fileName = url.split('/').pop();
@@ -357,6 +428,5 @@
         loadSongs();
         calculateDatingDays();
     </script>
-
 </body>
 </html>
