@@ -12,6 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
     <style>
         :root {
@@ -50,104 +51,113 @@
             margin: 40px 0;
         }
 
-        .dating-container {
+        /* PREVIEW STYLES */
+        #previewContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .preview-item {
+            position: relative;
+            background: rgba(255,255,255,0.1);
+            padding: 8px;
+            border-radius: 12px;
+            cursor: grab;
+            transition: 0.3s;
+        }
+
+            .preview-item:active {
+                cursor: grabbing;
+            }
+
+            .preview-item img {
+                width: 100%;
+                height: 120px;
+                object-fit: cover;
+                border-radius: 8px;
+                margin-bottom: 5px;
+            }
+
+        .file-name {
+            font-size: 10px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            opacity: 0.7;
+            margin: 0;
+        }
+
+        .preview-badge {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            background: var(--primary-pink);
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 25px;
-            margin-top: 20px;
+            z-index: 10;
+            font-weight: bold;
         }
-
-        .avatar {
-            width: 110px;
-            height: 110px;
+        /* Nút xóa từng hình */
+        .remove-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #444;
+            color: white;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
-            border: 3px solid white;
-            object-fit: cover;
-            box-shadow: 0 0 20px rgba(255,255,255,0.2);
-            transition: 0.5s;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            z-index: 10;
         }
 
-            .avatar:hover {
-                transform: scale(1.1) rotate(5deg);
-                border-color: var(--primary-pink);
+            .remove-btn:hover {
+                background: #ff4d6d;
             }
 
-        .avatar-name {
-            font-size: 0.9rem;
-            margin-top: 10px;
-            font-weight: 600;
-            opacity: 0.9;
-            text-align: center;
-        }
-
-        .days-number {
-            font-family: 'Dancing Script', cursive;
-            font-size: 3.8rem;
-            color: var(--primary-pink);
-            line-height: 1;
-        }
-
-        .heart-icon {
-            color: #ff4d6d;
-            font-size: 1.5rem;
-            animation: heartBeat 1.2s infinite;
-            display: inline-block;
-        }
-
-        @keyframes heartBeat {
-            0% {
-                transform: scale(1);
-            }
-
-            14% {
-                transform: scale(1.3);
-            }
-
-            28% {
-                transform: scale(1);
-            }
-
-            42% {
-                transform: scale(1.3);
-            }
-
-            70% {
-                transform: scale(1);
-            }
-        }
-
-        .form-control {
-            background: rgba(255, 255, 255, 0.1) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            color: white !important;
-        }
-
+        /* Style Buttons */
         .btn-upload {
             background: var(--primary-pink);
             border: none;
-            font-weight: 600;
-            transition: 0.3s;
             color: white;
-            padding: 10px;
+            font-weight: 600;
         }
-
-            .btn-upload:hover {
-                background: var(--hover-pink);
-                transform: translateY(-2px);
-            }
 
         .btn-convert {
             background: #00b4d8;
             border: none;
             font-weight: 600;
             color: white;
-            transition: 0.3s;
         }
 
-            .btn-convert:hover {
-                background: #0077b6;
-                transform: translateY(-2px);
+        .btn-reset {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            font-size: 0.8rem;
+        }
+
+            .btn-reset:hover {
+                background: rgba(255, 77, 109, 0.2);
+                color: #ff4d6d;
             }
 
         #pdfFile, #imgToPdf {
@@ -162,9 +172,6 @@
             border: 1px dashed rgba(255, 255, 255, 0.4);
             border-radius: 8px;
             text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .list-group-item {
@@ -173,13 +180,7 @@
             color: white;
             margin-bottom: 10px;
             border-radius: 15px !important;
-            transition: 0.3s;
         }
-
-            .list-group-item:hover {
-                background: rgba(255, 255, 255, 0.18);
-                transform: translateX(10px);
-            }
 
         .song-link {
             color: white;
@@ -191,12 +192,7 @@
         .delete-icon {
             color: rgba(255, 255, 255, 0.3);
             cursor: pointer;
-            transition: 0.3s;
         }
-
-            .delete-icon:hover {
-                color: #ff4d6d;
-            }
     </style>
 </head>
 <body>
@@ -220,7 +216,7 @@
                             <input type="file" id="pdfFile" accept=".pdf" onchange="updateFileName()">
                         </div>
                         <div class="col-md-2 text-end">
-                            <button class="btn btn-upload w-100" onclick="uploadSong()">
+                            <button class="btn btn-upload w-100 p-2" onclick="uploadSong()">
                                 <i class="bi bi-cloud-plus-fill"></i>
                             </button>
                         </div>
@@ -228,13 +224,18 @@
                 </div>
 
                 <div class="glass-card p-4 mb-4">
-                    <h5 class="mb-3"><i class="bi bi-magic me-2 text-info"></i>Gộp Ảnh (iPhone/Android) sang PDF</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="m-0"><i class="bi bi-magic me-2 text-info"></i>Gộp Ảnh sang PDF</h5>
+                        <button class="btn btn-sm btn-reset" onclick="resetAllImages()">
+                            <i class="bi bi-arrow-counterclockwise"></i> Reset
+                        </button>
+                    </div>
                     <div class="row g-2 align-items-center">
                         <div class="col-md-9">
                             <label for="imgToPdf" class="custom-file-upload" id="imgLabel">
-                                <i class="bi bi-images me-1"></i> Chọn ảnh (JPG, PNG, HEIC...)
+                                <i class="bi bi-images me-1"></i> Chọn ảnh (iPhone/Android)
                             </label>
-                            <input type="file" id="imgToPdf" accept="image/*,.heic,.HEIC" multiple onchange="updateImgLabel()">
+                            <input type="file" id="imgToPdf" accept="image/*,.heic,.HEIC" multiple onchange="handleFileSelect()">
                         </div>
                         <div class="col-md-3">
                             <button id="btnConvert" class="btn btn-convert w-100 p-2" onclick="generatePDF()">
@@ -242,14 +243,15 @@
                             </button>
                         </div>
                     </div>
+
+                    <div id="previewContainer" style="display: none;"></div>
                     <div id="pdfStatus" class="small mt-2 text-center opacity-75"></div>
                 </div>
 
                 <div class="glass-card p-2 mb-4">
                     <div class="input-group">
                         <span class="input-group-text bg-transparent border-0 text-white opacity-50"><i class="bi bi-search"></i></span>
-                        <input type="text" id="searchInput" class="form-control bg-transparent border-0"
-                               placeholder="Tìm bài hát của Oanh..." oninput="filterSongs()">
+                        <input type="text" id="searchInput" class="form-control bg-transparent border-0" placeholder="Tìm bài hát của Oanh..." oninput="filterSongs()">
                     </div>
                 </div>
 
@@ -260,18 +262,18 @@
                 <div class="glass-card p-5">
                     <h4 class="text-center dating-title mb-4">Our Love Story</h4>
                     <div class="dating-container">
-                        <div class="avatar-box">
+                        <div class="avatar-box text-center">
                             <img src="dang.jpg" class="avatar" alt="Anh Đăng">
-                            <div class="avatar-name">Anh Đăng</div>
+                            <div class="avatar-name mt-2">Anh Đăng</div>
                         </div>
                         <div class="counter-box text-center">
                             <div class="heart-icon"><i class="bi bi-heart-fill"></i></div>
                             <div id="daysCount" class="days-number">0</div>
-                            <div style="font-size: 0.8rem; opacity: 0.6; letter-spacing: 2px; font-weight: 600;">NGÀY BÊN NHAU</div>
+                            <div style="font-size: 0.7rem; opacity: 0.6; font-weight: 600;">NGÀY BÊN NHAU</div>
                         </div>
-                        <div class="avatar-box">
+                        <div class="avatar-box text-center">
                             <img src="oanh.jpg" class="avatar" alt="Bé Oanh">
-                            <div class="avatar-name">Bé Oanh</div>
+                            <div class="avatar-name mt-2">Bé Oanh</div>
                         </div>
                     </div>
                 </div>
@@ -281,62 +283,101 @@
     </div>
 
     <script>
-        // CẤU HÌNH SUPABASE
         const _URL = 'https://vvmivjmgepmosdwkiagb.supabase.co';
         const _KEY = 'sb_publishable_f9No0YOA6vmNDJwdE_GG3w_gtKXbIcF';
         const _supabase = supabase.createClient(_URL, _KEY);
-
         const startDate = new Date('2024-05-21');
 
-        function calculateDatingDays() {
-            const now = new Date();
-            const diffTime = Math.abs(now - startDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            document.getElementById('daysCount').innerText = diffDays;
+        // Khởi tạo kéo thả
+        const previewContainer = document.getElementById('previewContainer');
+        const sortable = Sortable.create(previewContainer, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onEnd: updateBadges // Cập nhật lại số trang khi kéo thả xong
+        });
+
+        function updateBadges() {
+            const items = previewContainer.querySelectorAll('.preview-item');
+            items.forEach((item, index) => {
+                item.querySelector('.preview-badge').innerText = index + 1;
+            });
+            document.getElementById('imgLabel').innerHTML = `<i class="bi bi-check-all text-success"></i> Đã chọn ${items.length} ảnh`;
         }
 
-        let allSongs = [];
-
-        function updateFileName() {
-            const input = document.getElementById('pdfFile');
-            const label = document.getElementById('fileLabel');
-            if (input.files.length > 0) label.innerHTML = `<i class="bi bi-check2-circle text-success"></i> ${input.files[0].name}`;
-        }
-
-        function updateImgLabel() {
+        // 1. CHỌN FILE VÀ PREVIEW
+        function handleFileSelect() {
             const input = document.getElementById('imgToPdf');
-            const label = document.getElementById('imgLabel');
-            if (input.files.length > 0) label.innerHTML = `<i class="bi bi-check-all text-success"></i> Đã chọn ${input.files.length} ảnh`;
+            const files = Array.from(input.files);
+            if (files.length === 0) return;
+
+            previewContainer.style.display = "grid";
+            files.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+            files.forEach((file) => {
+                const item = document.createElement('div');
+                item.className = 'preview-item';
+                item.fileObject = file; // Lưu trữ file
+
+                let imgSrc = "https://placehold.co/100x120?text=HEIC";
+                if (file.type !== "image/heic" && !file.name.toLowerCase().endsWith(".heic")) {
+                    imgSrc = URL.createObjectURL(file);
+                }
+
+                item.innerHTML = `
+                        <div class="preview-badge">0</div>
+                        <div class="remove-btn" onclick="removeThisImage(this.parentElement)"><i class="bi bi-x"></i></div>
+                        <img src="${imgSrc}">
+                        <p class="file-name">${file.name}</p>
+                    `;
+                previewContainer.appendChild(item);
+            });
+            updateBadges();
+            input.value = ""; // Clear input để có thể chọn lại cùng 1 file
         }
 
-        // --- XỬ LÝ CHUYỂN ĐỔI PDF (BAO GỒM HEIC) ---
+        // 2. XÓA TỪNG HÌNH
+        function removeThisImage(element) {
+            element.remove();
+            updateBadges();
+            if (previewContainer.querySelectorAll('.preview-item').length === 0) {
+                previewContainer.style.display = "none";
+                document.getElementById('imgLabel').innerHTML = `<i class="bi bi-images me-1"></i> Chọn ảnh trang 1, 2, 3...`;
+            }
+        }
+
+        // 3. RESET TẤT CẢ
+        function resetAllImages() {
+            if (confirm("Xóa hết ảnh đang chọn nhen Oanh?")) {
+                previewContainer.innerHTML = "";
+                previewContainer.style.display = "none";
+                document.getElementById('imgLabel').innerHTML = `<i class="bi bi-images me-1"></i> Chọn ảnh trang 1, 2, 3...`;
+                document.getElementById('pdfStatus').innerText = "";
+            }
+        }
+
+        // 4. GỘP PDF
         async function generatePDF() {
             const { jsPDF } = window.jspdf;
-            const input = document.getElementById('imgToPdf');
             const status = document.getElementById('pdfStatus');
             const btn = document.getElementById('btnConvert');
+            const items = Array.from(previewContainer.querySelectorAll('.preview-item'));
 
-            if (input.files.length === 0) return alert('Oanh ơi, chọn ảnh trước nhen! ❤️');
+            if (items.length === 0) return alert('Oanh ơi, chọn ảnh trước nhen! ❤️');
 
             btn.disabled = true;
-            status.innerHTML = "Đang giải mã ảnh (HEIC có thể hơi lâu xíu)... ⏳";
+            status.innerHTML = "Đang gộp nhạc... ⏳";
 
             const pdf = new jsPDF();
             const pageWidth = pdf.internal.pageSize.getWidth();
             const pageHeight = pdf.internal.pageSize.getHeight();
 
             try {
-                for (let i = 0; i < input.files.length; i++) {
-                    let file = input.files[i];
+                for (let i = 0; i < items.length; i++) {
+                    let file = items[i].fileObject;
+                    status.innerHTML = `Đang xử lý trang ${i + 1}/${items.length}...`;
 
-                    // Kiểm tra nếu là file HEIC
                     if (file.type === "image/heic" || file.name.toLowerCase().endsWith(".heic")) {
-                        status.innerHTML = `Đang chuyển đổi ảnh iPhone thứ ${i + 1}... 📱`;
-                        const convertedBlob = await heic2any({
-                            blob: file,
-                            toType: "image/jpeg",
-                            quality: 0.7
-                        });
+                        const convertedBlob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.7 });
                         file = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
                     }
 
@@ -351,41 +392,40 @@
                 }
 
                 pdf.save(`Nhac_Oanh_${Date.now()}.pdf`);
-                status.innerHTML = "✅ Xong rồi! Oanh dùng file vừa tải về để upload nhen.";
+                status.innerHTML = "✅ Xong rồi! Oanh dùng file này upload nhen.";
             } catch (err) {
-                console.error(err);
-                alert("Lỗi khi xử lý ảnh HEIC. Đăng kiểm tra console nhen!");
-                status.innerHTML = "❌ Lỗi xử lý.";
+                alert("Lỗi: " + err.message);
             } finally {
                 btn.disabled = false;
             }
         }
 
-        // --- LOGIC SUPABASE ---
+        // --- SUPABASE & UTILS ---
+        function calculateDatingDays() {
+            const diffTime = Math.abs(new Date() - startDate);
+            document.getElementById('daysCount').innerText = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        function updateFileName() {
+            const input = document.getElementById('pdfFile');
+            if (input.files.length > 0) document.getElementById('fileLabel').innerHTML = `<i class="bi bi-check2-circle text-success"></i> ${input.files[0].name}`;
+        }
+
         async function loadSongs() {
             const { data, error } = await _supabase.from('song').select('*').order('ngay_tao', { ascending: false });
-            if (error) {
-                document.getElementById('musicList').innerHTML = `<div class="text-center text-warning">Lỗi RLS nhen Đăng!</div>`;
-                return;
-            }
+            if (error) return;
             allSongs = data || [];
             renderList(allSongs);
         }
 
         function renderList(songs) {
             const list = document.getElementById('musicList');
-            if (songs.length === 0) {
-                list.innerHTML = `<div class="text-center opacity-50 mt-5">Chưa có bản nhạc nào... ❤️</div>`;
-                return;
-            }
+            if (songs.length === 0) { list.innerHTML = `<div class="text-center opacity-50 mt-5">Chưa có bài hát nào... ❤️</div>`; return; }
             list.innerHTML = songs.map(song => `
                     <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <a href="${song.pdf_url}" target="_blank" class="song-link">
-                            <i class="bi bi-music-note-beamed me-2 text-danger"></i> ${song.ten_nhac}
-                        </a>
+                        <a href="${song.pdf_url}" target="_blank" class="song-link"><i class="bi bi-music-note-beamed me-2 text-danger"></i> ${song.ten_nhac}</a>
                         <i class="bi bi-trash3 delete-icon" onclick="deleteSong(${song.id}, '${song.pdf_url}')"></i>
-                    </div>
-                `).join('');
+                    </div>`).join('');
         }
 
         function filterSongs() {
@@ -397,24 +437,15 @@
             const ten_nhac = document.getElementById('songTitle').value;
             const file = document.getElementById('pdfFile').files[0];
             const btn = document.querySelector('.btn-upload');
-
-            if (!ten_nhac || !file) return alert('Nhập tên và chọn file PDF nhen! ❤️');
-
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-            btn.disabled = true;
-
+            if (!ten_nhac || !file) return alert('Nhập tên nhen Oanh! ❤️');
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>'; btn.disabled = true;
             const fileName = `${Date.now()}_${file.name}`;
-            const { data: uploadData, error: upError } = await _supabase.storage.from('pdfs').upload(fileName, file);
-
+            const { data: uploadData } = await _supabase.storage.from('pdfs').upload(fileName, file);
             if (uploadData) {
                 const { data: urlData } = _supabase.storage.from('pdfs').getPublicUrl(fileName);
                 await _supabase.from('song').insert([{ ten_nhac: ten_nhac, pdf_url: urlData.publicUrl }]);
                 location.reload();
-            } else {
-                alert('Lỗi: ' + upError.message);
-                btn.innerHTML = '<i class="bi bi-cloud-plus-fill"></i>';
-                btn.disabled = false;
-            }
+            } else { btn.disabled = false; btn.innerHTML = '<i class="bi bi-cloud-plus-fill"></i>'; }
         }
 
         async function deleteSong(id, url) {
@@ -425,8 +456,7 @@
             location.reload();
         }
 
-        loadSongs();
-        calculateDatingDays();
+        loadSongs(); calculateDatingDays();
     </script>
 </body>
 </html>
