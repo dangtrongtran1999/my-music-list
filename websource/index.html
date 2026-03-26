@@ -29,12 +29,12 @@
             background-attachment: fixed;
             min-height: 100vh;
             color: white;
-            padding-bottom: 80px;
+            padding-bottom: 100px;
             margin: 0;
             overflow-x: hidden;
         }
 
-        /* --- BACKGROUND ĐỘNG: TIM BAY --- */
+        /* --- BACKGROUND TIM BAY --- */
         .heart-bg {
             position: fixed;
             top: 0;
@@ -62,10 +62,6 @@
                 opacity: 0.8;
             }
 
-            90% {
-                opacity: 0.8;
-            }
-
             100% {
                 transform: translateY(-110vh) rotate(360deg);
                 opacity: 0;
@@ -81,7 +77,34 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
 
-        /* --- FIX CHỮ TRONG ACCORDION SÁNG HƠN --- */
+        /* --- FIX LỖI CHOOSE FILE & CĂN CHỈNH --- */
+        input[type="file"] {
+            display: none !important;
+        }
+        /* Ẩn tuyệt đối nút mặc định */
+
+        .custom-file-upload {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            height: 45px;
+            transition: 0.3s;
+        }
+
+            .custom-file-upload:hover {
+                background: rgba(255, 255, 255, 0.25);
+                border-color: white;
+            }
+
+        /* --- ACCORDION & CHỮ SÁNG --- */
         .accordion-item {
             background: transparent;
             border: none;
@@ -91,8 +114,6 @@
             background: rgba(255,255,255,0.1);
             color: white !important;
             border-radius: 15px !important;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
         }
 
             .accordion-button:not(.collapsed) {
@@ -116,15 +137,6 @@
             opacity: 1 !important;
         }
 
-        .accordion-body .small {
-            color: rgba(255,255,255,1) !important;
-            font-weight: 500;
-        }
-
-        .form-control::placeholder {
-            color: rgba(255,255,255,0.4) !important;
-        }
-
         h2, .dating-title {
             font-family: 'Dancing Script', cursive;
             text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
@@ -134,6 +146,34 @@
             font-size: 3.5rem;
             margin: 40px 0;
         }
+
+        /* --- PHÂN TRANG --- */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn-page {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+            .btn-page:hover:not(:disabled) {
+                background: var(--primary-pink);
+                border-color: var(--primary-pink);
+            }
+
+            .btn-page:disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+            }
 
         /* --- DATING COUNTER --- */
         .dating-container {
@@ -151,13 +191,7 @@
             border-radius: 50% !important;
             border: 3px solid white;
             object-fit: cover;
-            transition: 0.5s;
         }
-
-            .avatar:hover {
-                transform: scale(1.1) rotate(5deg);
-                border-color: var(--primary-pink);
-            }
 
         .days-number {
             font-family: 'Dancing Script', cursive;
@@ -192,14 +226,13 @@
             padding: 10px 15px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             border-radius: 50px !important;
-            transition: 0.3s;
         }
 
         .play-btn {
-            width: 35px;
-            height: 35px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             background: var(--primary-pink);
             border: none;
@@ -221,34 +254,15 @@
         }
 
         .music-player-container:hover .volume-control {
-            width: 120px;
+            width: 110px;
         }
 
         #volumeSlider {
-            width: 80px;
+            width: 70px;
             accent-color: var(--primary-pink);
-            cursor: pointer;
         }
 
-        .playing {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.7);
-            }
-
-            70% {
-                box-shadow: 0 0 0 15px rgba(255, 77, 109, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 77, 109, 0);
-            }
-        }
-
-        /* --- PREVIEW PDF --- */
+        /* --- PREVIEW --- */
         #previewContainer {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -296,15 +310,14 @@
             right: -5px;
             background: #444;
             color: white;
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             font-size: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            z-index: 10;
             border: 1px solid rgba(255,255,255,0.3);
         }
 
@@ -312,31 +325,7 @@
             background: rgba(255, 255, 255, 0.1) !important;
             border: 1px solid rgba(255, 255, 255, 0.2) !important;
             color: white !important;
-        }
-
-        .btn-upload {
-            background: var(--primary-pink);
-            border: none;
-            color: white;
-            font-weight: 600;
-        }
-
-        .btn-convert {
-            background: #00b4d8;
-            border: none;
-            font-weight: 600;
-            color: white;
-        }
-
-        .custom-file-upload {
-            display: block;
-            padding: 7px 15px;
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px dashed rgba(255, 255, 255, 0.4);
-            border-radius: 8px;
-            text-align: center;
-            color: white;
+            height: 45px;
         }
 
         .list-group-item {
@@ -358,6 +347,11 @@
             text-decoration: none;
             flex-grow: 1;
             font-weight: 500;
+        }
+
+        .delete-icon {
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
         }
     </style>
 </head>
@@ -388,7 +382,7 @@
                                             <label for="pdfFile" class="custom-file-upload" id="fileLabel"><i class="bi bi-file-earmark-pdf"></i> Chọn file PDF</label>
                                             <input type="file" id="pdfFile" accept=".pdf" onchange="updateFileName()">
                                         </div>
-                                        <div class="col-md-2"><button class="btn btn-upload w-100 p-2" onclick="uploadSong()"><i class="bi bi-cloud-plus-fill"></i></button></div>
+                                        <div class="col-md-2"><button class="btn btn-danger w-100 p-2 h-100" onclick="uploadSong()"><i class="bi bi-cloud-plus-fill"></i></button></div>
                                     </div>
                                 </div>
                                 <hr class="opacity-25">
@@ -402,7 +396,7 @@
                                             <label for="imgToPdf" class="custom-file-upload" id="imgLabel"><i class="bi bi-images"></i> Chọn ảnh iPhone/Android</label>
                                             <input type="file" id="imgToPdf" accept="image/*,.heic,.HEIC" multiple onchange="handleFileSelect()">
                                         </div>
-                                        <div class="col-md-3"><button id="btnConvert" class="btn btn-convert w-100 p-2" onclick="generatePDF()">Gộp Ngay</button></div>
+                                        <div class="col-md-3"><button id="btnConvert" class="btn btn-info w-100 p-2 text-white fw-bold" onclick="generatePDF()">Gộp Ngay</button></div>
                                     </div>
                                     <div id="previewContainer" style="display: none;"></div>
                                     <div id="pdfStatus" class="small mt-2 text-center"></div>
@@ -427,7 +421,7 @@
                     <h4 class="dating-title mb-4">Our Love Story</h4>
                     <div class="dating-container">
                         <div class="avatar-box">
-                            <img src="dang.jpg" class="avatar" alt="Đăng">
+                            <img src="dang.jpg" class="avatar" alt="Anh Đăng">
                             <div class="avatar-name mt-2 fw-bold">Anh Đăng</div>
                         </div>
                         <div class="counter-box">
@@ -436,7 +430,7 @@
                             <div style="font-size: 0.7rem; opacity: 0.8; font-weight: 600;">NGÀY BÊN NHAU</div>
                         </div>
                         <div class="avatar-box">
-                            <img src="oanh.jpg" class="avatar" alt="Oanh">
+                            <img src="oanh.jpg" class="avatar" alt="Bé Oanh">
                             <div class="avatar-name mt-2 fw-bold">Bé Oanh</div>
                         </div>
                     </div>
@@ -458,31 +452,131 @@
     </div>
 
     <script>
+        // --- CẤU HÌNH SUPABASE ---
         const _URL = 'https://vvmivjmgepmosdwkiagb.supabase.co';
         const _KEY = 'sb_publishable_f9No0YOA6vmNDJwdE_GG3w_gtKXbIcF';
         const _supabase = supabase.createClient(_URL, _KEY);
         const startDate = new Date('2024-05-21');
 
-        // Logic Nhạc
+        let allSongs = [];
+        let filteredSongs = [];
+        let currentPage = 1;
+        const pageSize = 10;
+
+        // Tải danh sách
+        async function loadSongs() {
+            const { data, error } = await _supabase.from('song').select('*').order('ten_nhac', { ascending: true });
+            if (error) return;
+            allSongs = data || [];
+            filteredSongs = [...allSongs];
+            renderList();
+        }
+
+        // Render & Phân trang
+        function renderList() {
+            const list = document.getElementById('musicList');
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const items = filteredSongs.slice(start, end);
+
+            if (filteredSongs.length === 0) {
+                list.innerHTML = `<div class="text-center opacity-50 mt-5">Chưa có bài hát nào... ❤️</div>`;
+                return;
+            }
+
+            let html = items.map(song => `
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="${song.pdf_url}" target="_blank" class="song-link"><i class="bi bi-music-note-beamed me-2 text-danger"></i> ${song.ten_nhac}</a>
+                        <i class="bi bi-trash3 delete-icon" onclick="deleteSong(${song.id}, '${song.pdf_url}')"></i>
+                    </div>`).join('');
+
+            const totalPages = Math.ceil(filteredSongs.length / pageSize);
+            if (totalPages > 1) {
+                html += `
+                    <div class="pagination-container">
+                        <button class="btn-page" onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}><i class="bi bi-chevron-left"></i></button>
+                        <span class="small opacity-75">Trang ${currentPage} / ${totalPages}</span>
+                        <button class="btn-page" onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}><i class="bi bi-chevron-right"></i></button>
+                    </div>`;
+            }
+            list.innerHTML = html;
+        }
+
+        function changePage(step) { currentPage += step; renderList(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        function filterSongs() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            filteredSongs = allSongs.filter(s => s.ten_nhac.toLowerCase().includes(query));
+            currentPage = 1;
+            renderList();
+        }
+
+        // Tool Gộp PDF
+        const previewContainer = document.getElementById('previewContainer');
+        Sortable.create(previewContainer, { animation: 150, onEnd: updateBadges });
+
+        function updateBadges() {
+            const items = previewContainer.querySelectorAll('.preview-item');
+            items.forEach((item, index) => { item.querySelector('.preview-badge').innerText = index + 1; });
+            document.getElementById('imgLabel').innerHTML = `<i class="bi bi-check-all text-success"></i> Đã chọn ${items.length} ảnh`;
+        }
+
+        function handleFileSelect() {
+            const input = document.getElementById('imgToPdf');
+            const files = Array.from(input.files);
+            if (files.length === 0) return;
+            previewContainer.style.display = "grid";
+            files.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+            files.forEach((file) => {
+                const item = document.createElement('div');
+                item.className = 'preview-item';
+                item.fileObject = file;
+                let imgSrc = "https://placehold.co/100x120?text=HEIC";
+                if (!file.name.toLowerCase().endsWith(".heic")) imgSrc = URL.createObjectURL(file);
+                item.innerHTML = `<div class="preview-badge">0</div><div class="remove-btn" onclick="this.parentElement.remove();updateBadges();"><i class="bi bi-x"></i></div><img src="${imgSrc}"><p style="font-size:8px; margin:5px 0 0 0; overflow:hidden; white-space:nowrap; opacity:0.7;">${file.name}</p>`;
+                previewContainer.appendChild(item);
+            });
+            updateBadges();
+            input.value = "";
+        }
+
+        async function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const btn = document.getElementById('btnConvert');
+            const status = document.getElementById('pdfStatus');
+            const items = Array.from(previewContainer.querySelectorAll('.preview-item'));
+            if (items.length === 0) return alert('Chọn ảnh nhen Oanh!');
+            btn.disabled = true; status.innerHTML = "Đang gộp nhạc... ⏳";
+            const pdf = new jsPDF();
+            try {
+                for (let i = 0; i < items.length; i++) {
+                    let file = items[i].fileObject;
+                    if (file.name.toLowerCase().endsWith(".heic")) {
+                        const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.7 });
+                        file = Array.isArray(blob) ? blob[0] : blob;
+                    }
+                    const data = await new Promise(r => { const reader = new FileReader(); reader.onload = e => r(e.target.result); reader.readAsDataURL(file); });
+                    if (i > 0) pdf.addPage();
+                    pdf.addImage(data, 'JPEG', 0, 0, 210, 297);
+                }
+                pdf.save(`Nhac_Oanh_${Date.now()}.pdf`);
+                status.innerHTML = "✅ Xong rồi!";
+            } catch (e) { alert("Lỗi rồi nhen!"); } finally { btn.disabled = false; }
+        }
+
+        function resetAllImages() { previewContainer.innerHTML = ""; previewContainer.style.display = "none"; document.getElementById('imgLabel').innerHTML = `<i class="bi bi-images"></i> Chọn ảnh iPhone/Android`; }
+
+        // Nhạc nền
         const bgMusic = document.getElementById('bgMusic');
         const playBtn = document.getElementById('playBtn');
         const playIcon = document.getElementById('playIcon');
-        const volumeSlider = document.getElementById('volumeSlider');
-
         playBtn.addEventListener('click', () => {
-            if (bgMusic.paused) {
-                bgMusic.play().catch(e => console.log("Cần click để phát nhen!"));
-                playIcon.classList.replace('bi-play-fill', 'bi-pause-fill');
-                playBtn.classList.add('playing');
-            } else {
-                bgMusic.pause();
-                playIcon.classList.replace('bi-pause-fill', 'bi-play-fill');
-                playBtn.classList.remove('playing');
-            }
+            if (bgMusic.paused) { bgMusic.play().catch(e => console.log(e)); playIcon.className = 'bi bi-pause-fill'; playBtn.classList.add('playing'); }
+            else { bgMusic.pause(); playIcon.className = 'bi bi-play-fill'; playBtn.classList.remove('playing'); }
         });
-        volumeSlider.addEventListener('input', (e) => { bgMusic.volume = e.target.value; });
+        document.getElementById('volumeSlider').addEventListener('input', (e) => { bgMusic.volume = e.target.value; });
 
-        // Hiệu ứng Tim
+        // Tim bay
         function createHearts() {
             const bg = document.getElementById('heartBg');
             setInterval(() => {
@@ -493,33 +587,33 @@
                 heart.style.animationDuration = (Math.random() * 8 + 10) + 's';
                 bg.appendChild(heart);
                 setTimeout(() => heart.remove(), 15000);
-            }, 1200);
+            }, 1000);
         }
 
-        // Supabase & Tool (Giữ nguyên logic A-Z và Gộp PDF)
-        async function loadSongs() {
-            const { data, error } = await _supabase.from('song').select('*').order('ten_nhac', { ascending: true });
-            if (error) return;
-            allSongs = data || [];
-            renderList(allSongs);
+        // Utils khác
+        async function uploadSong() {
+            const ten = document.getElementById('songTitle').value.trim();
+            const file = document.getElementById('pdfFile').files[0];
+            if (!ten || !file) return alert('Nhập tên nhen Oanh!');
+            const fileName = `${Date.now()}_${file.name}`;
+            const { data } = await _supabase.storage.from('pdfs').upload(fileName, file);
+            if (data) {
+                const { data: url } = _supabase.storage.from('pdfs').getPublicUrl(fileName);
+                await _supabase.from('song').insert([{ ten_nhac: ten, pdf_url: url.publicUrl }]);
+                location.reload();
+            }
         }
-
-        function renderList(songs) {
-            const list = document.getElementById('musicList');
-            if (songs.length === 0) { list.innerHTML = `<div class="text-center opacity-50 mt-5">Chưa có bản nhạc nào... ❤️</div>`; return; }
-            list.innerHTML = songs.map(song => `
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <a href="${song.pdf_url}" target="_blank" class="song-link"><i class="bi bi-music-note-beamed me-2 text-danger"></i> ${song.ten_nhac}</a>
-                        <i class="bi bi-trash3 delete-icon" onclick="deleteSong(${song.id}, '${song.pdf_url}')"></i>
-                    </div>`).join('');
+        async function deleteSong(id, url) {
+            if (!confirm('Xóa không?')) return;
+            const fileName = url.split('/').pop();
+            await _supabase.storage.from('pdfs').remove([fileName]);
+            await _supabase.from('song').delete().eq('id', id);
+            location.reload();
         }
-
-        // (Các hàm uploadSong, deleteSong, generatePDF, handleFileSelect giữ nguyên như bản trước)
-        // Đăng nhớ copy phần logic PDF từ code cũ nhen!
+        function updateFileName() { const input = document.getElementById('pdfFile'); if (input.files.length > 0) document.getElementById('fileLabel').innerHTML = input.files[0].name; }
 
         createHearts(); loadSongs();
-        const diff = Math.abs(new Date() - startDate);
-        document.getElementById('daysCount').innerText = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        document.getElementById('daysCount').innerText = Math.ceil(Math.abs(new Date() - startDate) / (1000 * 60 * 60 * 24));
     </script>
 </body>
 </html>
