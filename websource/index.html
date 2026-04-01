@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -16,6 +16,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
     <style>
+	h6{
+		color: pink;
+	}
         :root {
             --primary-pink: #ff4d6d;
             --hover-pink: #ff758f;
@@ -77,11 +80,14 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
 
-        /* --- FIX LỖI CHOOSE FILE & CĂN CHỈNH --- */
+        .modal-content.glass-card {
+            background: rgba(30, 30, 30, 0.9);
+            color: white;
+        }
+
         input[type="file"] {
             display: none !important;
         }
-        /* Ẩn tuyệt đối nút mặc định */
 
         .custom-file-upload {
             display: flex;
@@ -104,7 +110,7 @@
                 border-color: white;
             }
 
-        /* --- ACCORDION & CHỮ SÁNG --- */
+        /* PHỤC HỒI STYLE GỐC CỦA ĐĂNG ĐỂ KHÔNG BỊ DƯ TRÊN ĐẦU */
         .accordion-item {
             background: transparent;
             border: none;
@@ -126,17 +132,6 @@
                 filter: brightness(0) invert(1);
             }
 
-        .accordion-body h6 {
-            color: var(--primary-pink) !important;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .accordion-body label {
-            color: white !important;
-            opacity: 1 !important;
-        }
-
         h2, .dating-title {
             font-family: 'Dancing Script', cursive;
             text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
@@ -147,7 +142,6 @@
             margin: 40px 0;
         }
 
-        /* --- PHÂN TRANG --- */
         .pagination-container {
             display: flex;
             justify-content: center;
@@ -170,12 +164,6 @@
                 border-color: var(--primary-pink);
             }
 
-            .btn-page:disabled {
-                opacity: 0.3;
-                cursor: not-allowed;
-            }
-
-        /* --- DATING COUNTER --- */
         .dating-container {
             display: flex !important;
             flex-direction: row !important;
@@ -217,52 +205,6 @@
             }
         }
 
-        /* --- MUSIC PLAYER --- */
-        .music-player-container {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 1000;
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-radius: 50px !important;
-        }
-
-        .play-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: var(--primary-pink);
-            border: none;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        .volume-control {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            width: 0;
-            overflow: hidden;
-            transition: 0.5s;
-        }
-
-        .music-player-container:hover .volume-control {
-            width: 110px;
-        }
-
-        #volumeSlider {
-            width: 70px;
-            accent-color: var(--primary-pink);
-        }
-
-        /* --- PREVIEW --- */
         #previewContainer {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -288,44 +230,15 @@
                 border-radius: 5px;
             }
 
-        .preview-badge {
-            position: absolute;
-            top: -5px;
-            left: -5px;
-            background: var(--primary-pink);
-            color: white;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .remove-btn {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #444;
-            color: white;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
         .form-control {
             background: rgba(255, 255, 255, 0.1) !important;
             border: 1px solid rgba(255, 255, 255, 0.2) !important;
             color: white !important;
-            height: 45px;
+        }
+        
+        /* Giúp chữ mờ dễ đọc hơn xíu */
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6) !important;
         }
 
         .list-group-item {
@@ -349,9 +262,30 @@
             font-weight: 500;
         }
 
-        .delete-icon {
-            color: rgba(255, 255, 255, 0.3);
+        .composer-name {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            display: block;
+        }
+
+        .action-icon {
+            color: rgba(255, 255, 255, 0.4);
             cursor: pointer;
+            transition: 0.2s;
+            font-size: 1.1rem;
+            margin-left: 12px;
+        }
+
+            .action-icon:hover {
+                color: white;
+            }
+
+        .edit-icon:hover {
+            color: #4dabf7;
+        }
+
+        .delete-icon:hover {
+            color: var(--primary-pink);
         }
     </style>
 </head>
@@ -376,9 +310,12 @@
                             <div class="accordion-body px-4">
                                 <div class="mb-4">
                                     <h6><i class="bi bi-heart-fill me-2"></i>Thêm Giai Điệu Mới</h6>
+                                    <div class="row g-2 align-items-center mb-2">
+                                        <div class="col-md-6"><input type="text" id="songTitle" class="form-control" placeholder="Tên bài hát..."></div>
+                                        <div class="col-md-6"><input type="text" id="songComposer" class="form-control" placeholder="Tên tác giả..."></div>
+                                    </div>
                                     <div class="row g-2 align-items-center">
-                                        <div class="col-md-5"><input type="text" id="songTitle" class="form-control" placeholder="Tên bài hát..."></div>
-                                        <div class="col-md-5">
+                                        <div class="col-md-10">
                                             <label for="pdfFile" class="custom-file-upload" id="fileLabel"><i class="bi bi-file-earmark-pdf"></i> Chọn file PDF</label>
                                             <input type="file" id="pdfFile" accept=".pdf" onchange="updateFileName()">
                                         </div>
@@ -389,7 +326,7 @@
                                 <div>
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h6><i class="bi bi-magic me-2"></i>Gộp Ảnh sang PDF</h6>
-                                        <button class="btn btn-sm btn-reset" onclick="resetAllImages()">Reset</button>
+                                        <button class="btn btn-sm btn-reset text-white-50" onclick="resetAllImages()">Reset</button>
                                     </div>
                                     <div class="row g-2 align-items-center">
                                         <div class="col-md-9">
@@ -409,7 +346,7 @@
                 <div class="glass-card p-2 mb-4">
                     <div class="input-group">
                         <span class="input-group-text bg-transparent border-0 text-white opacity-50"><i class="bi bi-search"></i></span>
-                        <input type="text" id="searchInput" class="form-control bg-transparent border-0" placeholder="Tìm bài hát A-Z..." oninput="filterSongs()">
+                        <input type="text" id="searchInput" class="form-control bg-transparent border-0" placeholder="Tìm bài hát, tác giả..." oninput="filterSongs()">
                     </div>
                 </div>
 
@@ -440,19 +377,33 @@
         </div>
     </div>
 
-    <div class="music-player-container glass-card">
-        <button id="playBtn" class="play-btn"><i class="bi bi-play-fill" id="playIcon"></i></button>
-        <div class="volume-control">
-            <i class="bi bi-volume-up-fill small text-white"></i>
-            <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.5">
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-card">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i>Chỉnh sửa bài hát</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editSongId">
+                    <div class="mb-3">
+                        <label class="form-label small opacity-75">Tên bài hát</label>
+                        <input type="text" id="editSongTitle" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small opacity-75">Tên tác giả</label>
+                        <input type="text" id="editSongComposer" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger px-4" onclick="updateSong()">Lưu thay đổi</button>
+                </div>
+            </div>
         </div>
-        <audio id="bgMusic" loop>
-            <source src="kisstherain.mp3" type="audio/mpeg">
-        </audio>
     </div>
 
     <script>
-        // --- CẤU HÌNH SUPABASE ---
         const _URL = 'https://vvmivjmgepmosdwkiagb.supabase.co';
         const _KEY = 'sb_publishable_f9No0YOA6vmNDJwdE_GG3w_gtKXbIcF';
         const _supabase = supabase.createClient(_URL, _KEY);
@@ -462,8 +413,15 @@
         let filteredSongs = [];
         let currentPage = 1;
         const pageSize = 10;
+        let editModalObj;
 
-        // Tải danh sách
+        window.addEventListener('DOMContentLoaded', () => {
+            editModalObj = new bootstrap.Modal(document.getElementById('editModal'));
+            loadSongs();
+            createHearts();
+            document.getElementById('daysCount').innerText = Math.ceil(Math.abs(new Date() - startDate) / (1000 * 60 * 60 * 24));
+        });
+
         async function loadSongs() {
             const { data, error } = await _supabase.from('song').select('*').order('ten_nhac', { ascending: true });
             if (error) return;
@@ -472,12 +430,10 @@
             renderList();
         }
 
-        // Render & Phân trang
         function renderList() {
             const list = document.getElementById('musicList');
             const start = (currentPage - 1) * pageSize;
-            const end = start + pageSize;
-            const items = filteredSongs.slice(start, end);
+            const items = filteredSongs.slice(start, start + pageSize);
 
             if (filteredSongs.length === 0) {
                 list.innerHTML = `<div class="text-center opacity-50 mt-5">Chưa có bài hát nào... ❤️</div>`;
@@ -486,32 +442,71 @@
 
             let html = items.map(song => `
                     <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <a href="${song.pdf_url}" target="_blank" class="song-link"><i class="bi bi-music-note-beamed me-2 text-danger"></i> ${song.ten_nhac}</a>
-                        <i class="bi bi-trash3 delete-icon" onclick="deleteSong(${song.id}, '${song.pdf_url}')"></i>
+                        <div class="flex-grow-1">
+                            <a href="${song.pdf_url}" target="_blank" class="song-link">
+                                <i class="bi bi-music-note-beamed me-2 text-danger"></i> ${song.ten_nhac}
+                            </a>
+                            <span class="composer-name">${song.tac_gia || 'Không rõ tác giả'}</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-pencil-square action-icon edit-icon" onclick="openEditModal(${song.id}, '${song.ten_nhac.replace(/'/g, "\\'")}', '${(song.tac_gia || "").replace(/'/g, "\\'")}')"></i>
+                            <i class="bi bi-trash3 action-icon delete-icon" onclick="deleteSong(${song.id}, '${song.pdf_url}')"></i>
+                        </div>
                     </div>`).join('');
 
             const totalPages = Math.ceil(filteredSongs.length / pageSize);
             if (totalPages > 1) {
                 html += `
-                    <div class="pagination-container">
-                        <button class="btn-page" onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}><i class="bi bi-chevron-left"></i></button>
-                        <span class="small opacity-75">Trang ${currentPage} / ${totalPages}</span>
-                        <button class="btn-page" onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}><i class="bi bi-chevron-right"></i></button>
-                    </div>`;
+                        <div class="pagination-container">
+                            <button class="btn-page" onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}><i class="bi bi-chevron-left"></i></button>
+                            <span class="small opacity-75">Trang ${currentPage} / ${totalPages}</span>
+                            <button class="btn-page" onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}><i class="bi bi-chevron-right"></i></button>
+                        </div>`;
             }
             list.innerHTML = html;
+        }
+
+        function openEditModal(id, title, composer) {
+            document.getElementById('editSongId').value = id;
+            document.getElementById('editSongTitle').value = title;
+            document.getElementById('editSongComposer').value = composer;
+            editModalObj.show();
+        }
+
+        async function updateSong() {
+            const id = document.getElementById('editSongId').value;
+            const newTitle = document.getElementById('editSongTitle').value.trim();
+            const newComposer = document.getElementById('editSongComposer').value.trim();
+
+            if (!newTitle) return alert("Vui lòng nhập tên bài hát!");
+
+            const { error } = await _supabase
+                .from('song')
+                .update({ ten_nhac: newTitle, tac_gia: newComposer })
+                .eq('id', id);
+
+            if (error) {
+                console.error("Supabase Error Details:", error); 
+                alert("Lỗi: " + error.message); 
+            } else {
+                editModalObj.hide();
+                loadSongs();
+            }
         }
 
         function changePage(step) { currentPage += step; renderList(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
         function filterSongs() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            filteredSongs = allSongs.filter(s => s.ten_nhac.toLowerCase().includes(query));
+            filteredSongs = allSongs.filter(s =>
+                s.ten_nhac.toLowerCase().includes(query) ||
+                (s.tac_gia && s.tac_gia.toLowerCase().includes(query))
+            );
             currentPage = 1;
             renderList();
         }
 
-        // Tool Gộp PDF
+        // Tải ảnh & Gộp PDF thông minh
         const previewContainer = document.getElementById('previewContainer');
         Sortable.create(previewContainer, { animation: 150, onEnd: updateBadges });
 
@@ -522,12 +517,10 @@
         }
 
         function handleFileSelect() {
-            const input = document.getElementById('imgToPdf');
-            const files = Array.from(input.files);
+            const files = Array.from(document.getElementById('imgToPdf').files);
             if (files.length === 0) return;
             previewContainer.style.display = "grid";
-            files.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
-            files.forEach((file) => {
+            files.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })).forEach((file) => {
                 const item = document.createElement('div');
                 item.className = 'preview-item';
                 item.fileObject = file;
@@ -537,46 +530,44 @@
                 previewContainer.appendChild(item);
             });
             updateBadges();
-            input.value = "";
         }
 
         async function generatePDF() {
             const { jsPDF } = window.jspdf;
-            const btn = document.getElementById('btnConvert');
-            const status = document.getElementById('pdfStatus');
             const items = Array.from(previewContainer.querySelectorAll('.preview-item'));
             if (items.length === 0) return alert('Chọn ảnh nhen Oanh!');
-            btn.disabled = true; status.innerHTML = "Đang gộp nhạc... ⏳";
-            const pdf = new jsPDF();
+            const status = document.getElementById('pdfStatus');
+            status.innerHTML = "Đang xử lý thông minh... ⏳";
             try {
+                let pdf;
                 for (let i = 0; i < items.length; i++) {
                     let file = items[i].fileObject;
                     if (file.name.toLowerCase().endsWith(".heic")) {
-                        const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.7 });
+                        const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.8 });
                         file = Array.isArray(blob) ? blob[0] : blob;
                     }
-                    const data = await new Promise(r => { const reader = new FileReader(); reader.onload = e => r(e.target.result); reader.readAsDataURL(file); });
-                    if (i > 0) pdf.addPage();
-                    pdf.addImage(data, 'JPEG', 0, 0, 210, 297);
+                    const imgData = await new Promise(r => { const reader = new FileReader(); reader.onload = e => r(e.target.result); reader.readAsDataURL(file); });
+                    const img = new Image();
+                    await new Promise(r => { img.onload = r; img.src = imgData; });
+                    const orientation = img.width > img.height ? 'l' : 'p';
+                    if (i === 0) pdf = new jsPDF({ orientation: orientation, unit: 'mm', format: 'a4' });
+                    else pdf.addPage('a4', orientation);
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const imgRatio = img.width / img.height;
+                    const pageRatio = pageWidth / pageHeight;
+                    let finalW, finalH;
+                    if (imgRatio > pageRatio) { finalW = pageWidth; finalH = pageWidth / imgRatio; }
+                    else { finalH = pageHeight; finalW = pageHeight * imgRatio; }
+                    pdf.addImage(imgData, 'JPEG', (pageWidth - finalW) / 2, (pageHeight - finalH) / 2, finalW, finalH);
                 }
                 pdf.save(`Nhac_Oanh_${Date.now()}.pdf`);
-                status.innerHTML = "✅ Xong rồi!";
-            } catch (e) { alert("Lỗi rồi nhen!"); } finally { btn.disabled = false; }
+                status.innerHTML = "✅ Xong rồi, đẹp lung linh!";
+            } catch (e) { alert("Lỗi gộp file rồi Đăng ơi!"); }
         }
 
         function resetAllImages() { previewContainer.innerHTML = ""; previewContainer.style.display = "none"; document.getElementById('imgLabel').innerHTML = `<i class="bi bi-images"></i> Chọn ảnh iPhone/Android`; }
 
-        // Nhạc nền
-        const bgMusic = document.getElementById('bgMusic');
-        const playBtn = document.getElementById('playBtn');
-        const playIcon = document.getElementById('playIcon');
-        playBtn.addEventListener('click', () => {
-            if (bgMusic.paused) { bgMusic.play().catch(e => console.log(e)); playIcon.className = 'bi bi-pause-fill'; playBtn.classList.add('playing'); }
-            else { bgMusic.pause(); playIcon.className = 'bi bi-play-fill'; playBtn.classList.remove('playing'); }
-        });
-        document.getElementById('volumeSlider').addEventListener('input', (e) => { bgMusic.volume = e.target.value; });
-
-        // Tim bay
         function createHearts() {
             const bg = document.getElementById('heartBg');
             setInterval(() => {
@@ -584,36 +575,35 @@
                 heart.className = `floating-heart bi bi-heart-fill`;
                 heart.style.left = Math.random() * 100 + 'vw';
                 heart.style.fontSize = (Math.random() * 15 + 10) + 'px';
-                heart.style.animationDuration = (Math.random() * 8 + 10) + 's';
                 bg.appendChild(heart);
                 setTimeout(() => heart.remove(), 15000);
             }, 1000);
         }
 
-        // Utils khác
         async function uploadSong() {
             const ten = document.getElementById('songTitle').value.trim();
+            const tacgia = document.getElementById('songComposer').value.trim();
             const file = document.getElementById('pdfFile').files[0];
-            if (!ten || !file) return alert('Nhập tên nhen Oanh!');
+            if (!ten || !file) return alert('Nhập tên bài hát và chọn file nhen Oanh!');
             const fileName = `${Date.now()}_${file.name}`;
             const { data } = await _supabase.storage.from('pdfs').upload(fileName, file);
             if (data) {
                 const { data: url } = _supabase.storage.from('pdfs').getPublicUrl(fileName);
-                await _supabase.from('song').insert([{ ten_nhac: ten, pdf_url: url.publicUrl }]);
+                await _supabase.from('song').insert([{ ten_nhac: ten, tac_gia: tacgia, pdf_url: url.publicUrl }]);
                 location.reload();
             }
         }
+
         async function deleteSong(id, url) {
-            if (!confirm('Xóa không?')) return;
+            if (!confirm('Xóa bài hát này nhen?')) return;
             const fileName = url.split('/').pop();
             await _supabase.storage.from('pdfs').remove([fileName]);
             await _supabase.from('song').delete().eq('id', id);
             location.reload();
         }
+
         function updateFileName() { const input = document.getElementById('pdfFile'); if (input.files.length > 0) document.getElementById('fileLabel').innerHTML = input.files[0].name; }
 
-        createHearts(); loadSongs();
-        document.getElementById('daysCount').innerText = Math.ceil(Math.abs(new Date() - startDate) / (1000 * 60 * 60 * 24));
     </script>
 </body>
 </html>
