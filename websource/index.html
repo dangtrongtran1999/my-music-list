@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -16,9 +16,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
     <style>
-	h6{
-		color: pink;
-	}
+        h6{
+            color: hotpink;
+        }
         :root {
             --primary-pink: #ff4d6d;
             --hover-pink: #ff758f;
@@ -110,7 +110,6 @@
                 border-color: white;
             }
 
-        /* PHỤC HỒI STYLE GỐC CỦA ĐĂNG ĐỂ KHÔNG BỊ DƯ TRÊN ĐẦU */
         .accordion-item {
             background: transparent;
             border: none;
@@ -235,11 +234,10 @@
             border: 1px solid rgba(255, 255, 255, 0.2) !important;
             color: white !important;
         }
-        
-        /* Giúp chữ mờ dễ đọc hơn xíu */
-        .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.6) !important;
-        }
+
+            .form-control::placeholder {
+                color: rgba(255, 255, 255, 0.6) !important;
+            }
 
         .list-group-item {
             background: rgba(255, 255, 255, 0.08);
@@ -287,6 +285,30 @@
         .delete-icon:hover {
             color: var(--primary-pink);
         }
+
+        /* --- STYLE THANH LỌC CHỮ CÁI --- */
+        .alpha-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            user-select: none;
+        }
+
+            .alpha-btn:hover, .alpha-btn.active {
+                background: var(--primary-pink);
+                border-color: var(--primary-pink);
+                font-weight: bold;
+                box-shadow: 0 2px 8px rgba(255, 77, 109, 0.4);
+            }
     </style>
 </head>
 <body>
@@ -343,10 +365,14 @@
                     </div>
                 </div>
 
-                <div class="glass-card p-2 mb-4">
-                    <div class="input-group">
+                <div class="glass-card p-3 mb-4">
+                    <div class="input-group mb-3">
                         <span class="input-group-text bg-transparent border-0 text-white opacity-50"><i class="bi bi-search"></i></span>
                         <input type="text" id="searchInput" class="form-control bg-transparent border-0" placeholder="Tìm bài hát, tác giả..." oninput="filterSongs()">
+                    </div>
+                    <!-- Thanh lọc chữ cái -->
+                    <div class="d-flex flex-wrap justify-content-center gap-1" id="alphabetContainer">
+                        <!-- JS sẽ render nút vào đây -->
                     </div>
                 </div>
 
@@ -414,18 +440,50 @@
         let currentPage = 1;
         const pageSize = 10;
         let editModalObj;
+        let currentLetterFilter = '';
 
         window.addEventListener('DOMContentLoaded', () => {
             editModalObj = new bootstrap.Modal(document.getElementById('editModal'));
             loadSongs();
             createHearts();
+            renderAlphabet();
             document.getElementById('daysCount').innerText = Math.ceil(Math.abs(new Date() - startDate) / (1000 * 60 * 60 * 24));
         });
 
+        // Đã gỡ chữ Đ ra khỏi mảng hiển thị thanh lọc chữ cái
+        function renderAlphabet() {
+            const container = document.getElementById('alphabetContainer');
+            const chars = ['#', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+            container.innerHTML = chars.map(c =>
+                `<div class="alpha-btn" onclick="setLetterFilter('${c}')" id="btn-${c === '#' ? 'num' : c}">${c}</div>`
+            ).join('');
+        }
+
+        function setLetterFilter(letter) {
+            if (currentLetterFilter === letter) {
+                currentLetterFilter = '';
+            } else {
+                currentLetterFilter = letter;
+            }
+
+            document.querySelectorAll('.alpha-btn').forEach(btn => btn.classList.remove('active'));
+            if (currentLetterFilter) {
+                const activeBtn = document.getElementById(`btn-${letter === '#' ? 'num' : letter}`);
+                if (activeBtn) activeBtn.classList.add('active');
+            }
+            filterSongs();
+        }
+
         async function loadSongs() {
-            const { data, error } = await _supabase.from('song').select('*').order('ten_nhac', { ascending: true });
+            // Không order bằng Supabase nữa mà lấy hết về
+            const { data, error } = await _supabase.from('song').select('*');
             if (error) return;
+
             allSongs = data || [];
+
+            // XỬ LÝ SẮP XẾP LẠI THEO CHUẨN TIẾNG VIỆT ĐỂ CHỮ D VÀ Đ KHÔNG BỊ LỘN XỘN
+            allSongs.sort((a, b) => a.ten_nhac.localeCompare(b.ten_nhac, 'vi'));
+
             filteredSongs = [...allSongs];
             renderList();
         }
@@ -441,27 +499,27 @@
             }
 
             let html = items.map(song => `
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <div class="flex-grow-1">
-                            <a href="${song.pdf_url}" target="_blank" class="song-link">
-                                <i class="bi bi-music-note-beamed me-2 text-danger"></i> ${song.ten_nhac}
-                            </a>
-                            <span class="composer-name">${song.tac_gia || 'Không rõ tác giả'}</span>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <i class="bi bi-pencil-square action-icon edit-icon" onclick="openEditModal(${song.id}, '${song.ten_nhac.replace(/'/g, "\\'")}', '${(song.tac_gia || "").replace(/'/g, "\\'")}')"></i>
-                            <i class="bi bi-trash3 action-icon delete-icon" onclick="deleteSong(${song.id}, '${song.pdf_url}')"></i>
-                        </div>
-                    </div>`).join('');
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="flex-grow-1">
+                                    <a href="${song.pdf_url}" target="_blank" class="song-link">
+                                        <i class="bi bi-music-note-beamed me-2 text-danger"></i> ${song.ten_nhac}
+                                    </a>
+                                    <span class="composer-name">${song.tac_gia || 'Không rõ tác giả'}</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-pencil-square action-icon edit-icon" onclick="openEditModal(${song.id}, '${song.ten_nhac.replace(/'/g, "\\'")}', '${(song.tac_gia || "").replace(/'/g, "\\'")}')"></i>
+                                    <i class="bi bi-trash3 action-icon delete-icon" onclick="deleteSong(${song.id}, '${song.pdf_url}')"></i>
+                                </div>
+                            </div>`).join('');
 
             const totalPages = Math.ceil(filteredSongs.length / pageSize);
             if (totalPages > 1) {
                 html += `
-                        <div class="pagination-container">
-                            <button class="btn-page" onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}><i class="bi bi-chevron-left"></i></button>
-                            <span class="small opacity-75">Trang ${currentPage} / ${totalPages}</span>
-                            <button class="btn-page" onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}><i class="bi bi-chevron-right"></i></button>
-                        </div>`;
+                                <div class="pagination-container">
+                                    <button class="btn-page" onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}><i class="bi bi-chevron-left"></i></button>
+                                    <span class="small opacity-75">Trang ${currentPage} / ${totalPages}</span>
+                                    <button class="btn-page" onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}><i class="bi bi-chevron-right"></i></button>
+                                </div>`;
             }
             list.innerHTML = html;
         }
@@ -486,8 +544,8 @@
                 .eq('id', id);
 
             if (error) {
-                console.error("Supabase Error Details:", error); 
-                alert("Lỗi: " + error.message); 
+                console.error("Supabase Error Details:", error);
+                alert("Lỗi: " + error.message);
             } else {
                 editModalObj.hide();
                 loadSongs();
@@ -498,10 +556,26 @@
 
         function filterSongs() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            filteredSongs = allSongs.filter(s =>
-                s.ten_nhac.toLowerCase().includes(query) ||
-                (s.tac_gia && s.tac_gia.toLowerCase().includes(query))
-            );
+
+            filteredSongs = allSongs.filter(s => {
+                const matchSearch = s.ten_nhac.toLowerCase().includes(query) ||
+                    (s.tac_gia && s.tac_gia.toLowerCase().includes(query));
+
+                let matchLetter = true;
+                if (currentLetterFilter) {
+                    const firstChar = s.ten_nhac.trim().charAt(0).toUpperCase();
+                    if (currentLetterFilter === '#') {
+                        matchLetter = /^[0-9]/.test(firstChar);
+                    } else {
+                        // Ép chữ Đ về chữ D để khi bấm lọc D nó ra cả bài hát chữ Đ
+                        const normalizedChar = firstChar.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/Đ/g, "D").replace(/đ/g, "d");
+                        matchLetter = normalizedChar === currentLetterFilter;
+                    }
+                }
+
+                return matchSearch && matchLetter;
+            });
+
             currentPage = 1;
             renderList();
         }
