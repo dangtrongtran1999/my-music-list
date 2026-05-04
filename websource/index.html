@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿<!--<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -369,11 +369,11 @@
                     <div class="input-group mb-3">
                         <span class="input-group-text bg-transparent border-0 text-white opacity-50"><i class="bi bi-search"></i></span>
                         <input type="text" id="searchInput" class="form-control bg-transparent border-0" placeholder="Tìm bài hát, tác giả..." oninput="filterSongs()">
-                    </div>
-                    <!-- Thanh lọc chữ cái -->
-                    <div class="d-flex flex-wrap justify-content-center gap-1" id="alphabetContainer">
-                        <!-- JS sẽ render nút vào đây -->
-                    </div>
+                    </div>-->
+<!-- Thanh lọc chữ cái -->
+<!--<div class="d-flex flex-wrap justify-content-center gap-1" id="alphabetContainer">-->
+<!-- JS sẽ render nút vào đây -->
+<!--</div>
                 </div>
 
                 <div id="musicList" class="list-group mb-5">
@@ -678,6 +678,702 @@
 
         function updateFileName() { const input = document.getElementById('pdfFile'); if (input.files.length > 0) document.getElementById('fileLabel').innerHTML = input.files[0].name; }
 
+    </script>
+</body>
+</html>-->
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kho Nhạc Của Oanh 🎵</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <!-- THÊM THƯ VIỆN TẠO HIỆU ỨNG NGHIÊNG 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+
+    <style>
+        :root {
+            --primary-pink: #ff4d6d;
+            --hover-pink: #ff758f;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: white;
+            padding-bottom: 100px;
+            margin: 0;
+            overflow-x: hidden;
+            /* Phối cảnh 3D cho toàn trang */
+            perspective: 1000px;
+        }
+
+        /* --- BACKGROUND TIM BAY --- */
+        .heart-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-heart {
+            position: absolute;
+            color: rgba(255, 77, 109, 0.4);
+            animation: float 15s linear infinite;
+            bottom: -50px;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateY(-110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            /* Transform style để hiển thị 3D mượt hơn */
+            transform-style: preserve-3d;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .modal-content.glass-card {
+            background: rgba(30, 30, 30, 0.9);
+            color: white;
+        }
+
+        input[type="file"] {
+            display: none !important;
+        }
+
+        .custom-file-upload {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            height: 45px;
+            transition: 0.3s;
+        }
+
+            .custom-file-upload:hover {
+                background: rgba(255, 255, 255, 0.25);
+                border-color: white;
+            }
+
+        .accordion-item {
+            background: transparent;
+            border: none;
+        }
+
+        .accordion-button {
+            background: rgba(255,255,255,0.1);
+            color: white !important;
+            border-radius: 15px !important;
+        }
+
+            .accordion-button:not(.collapsed) {
+                background: rgba(255, 77, 109, 0.3);
+                color: white !important;
+                box-shadow: none;
+            }
+
+            .accordion-button::after {
+                filter: brightness(0) invert(1);
+            }
+
+        h2, .dating-title {
+            font-family: 'Dancing Script', cursive;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+            /* Hiệu ứng nổi cho tiêu đề nằm trên thẻ 3D */
+            transform: translateZ(30px);
+        }
+
+        h2 {
+            font-size: 3.5rem;
+            margin: 40px 0;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn-page {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+            .btn-page:hover:not(:disabled) {
+                background: var(--primary-pink);
+                border-color: var(--primary-pink);
+            }
+
+        .dating-container {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 20px;
+            /* Đẩy 3D các avatar nổi bần bật lên mặt kính */
+            transform: translateZ(50px);
+        }
+
+        .avatar {
+            width: 110px !important;
+            height: 110px !important;
+            border-radius: 50% !important;
+            border: 3px solid white;
+            object-fit: cover;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+
+        .days-number {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.8rem;
+            color: var(--primary-pink);
+            line-height: 1;
+            text-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
+        }
+
+        .heart-icon {
+            color: #ff4d6d;
+            font-size: 1.5rem;
+            animation: heartBeat 1.2s infinite;
+            display: inline-block;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.3);
+            }
+        }
+
+        #previewContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .preview-item {
+            position: relative;
+            background: rgba(255,255,255,0.1);
+            padding: 5px;
+            border-radius: 10px;
+            cursor: grab;
+        }
+
+            .preview-item img {
+                width: 100%;
+                height: 110px;
+                object-fit: cover;
+                border-radius: 5px;
+            }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+        }
+
+            .form-control::placeholder {
+                color: rgba(255, 255, 255, 0.6) !important;
+            }
+
+        /* --- STYLE 3D CHO BÀI HÁT --- */
+        .list-group-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-bottom: 12px;
+            border-radius: 15px !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            z-index: 1;
+            /* Tạo chiều sâu 3D */
+            transform-style: preserve-3d;
+        }
+
+            .list-group-item:hover {
+                background: rgba(255, 255, 255, 0.15);
+                /* Bật nhẹ 3D bay lên, bóng đổ dài xuống */
+                transform: perspective(1000px) translateZ(30px) translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+                z-index: 2;
+            }
+
+        .song-link {
+            color: white;
+            text-decoration: none;
+            flex-grow: 1;
+            font-weight: 500;
+        }
+
+        .composer-name {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            display: block;
+        }
+
+        .action-icon {
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 1.1rem;
+            margin-left: 12px;
+        }
+
+            .action-icon:hover {
+                color: white;
+            }
+
+        .edit-icon:hover {
+            color: #4dabf7;
+        }
+
+        .delete-icon:hover {
+            color: var(--primary-pink);
+        }
+
+        .alpha-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            user-select: none;
+        }
+
+            .alpha-btn:hover, .alpha-btn.active {
+                background: var(--primary-pink);
+                border-color: var(--primary-pink);
+                font-weight: bold;
+                box-shadow: 0 2px 8px rgba(255, 77, 109, 0.4);
+            }
+    </style>
+</head>
+<body>
+
+    <div class="heart-bg" id="heartBg"></div>
+
+    <div class="container">
+        <!-- Đặt 3D cho cái Tiêu đề to -->
+        <h2 class="text-center" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-perspective="1000">🎵 Kho Nhạc Của Oanh</h2>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- Thêm thuộc tính data-tilt để Khung kính có thể nghiêng 3D -->
+                <div class="accordion mb-4" id="toolAccordion" data-tilt data-tilt-max="3" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.1">
+                    <div class="accordion-item glass-card">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTools">
+                                <i class="bi bi-gear-fill me-2"></i> Công cụ quản lý nhạc
+                            </button>
+                        </h2>
+                        <div id="collapseTools" class="accordion-collapse collapse" data-bs-parent="#toolAccordion">
+                            <div class="accordion-body px-4">
+                                <div class="mb-4">
+                                    <h6><i class="bi bi-heart-fill me-2"></i>Thêm Giai Điệu Mới</h6>
+                                    <div class="row g-2 align-items-center mb-2">
+                                        <div class="col-md-6"><input type="text" id="songTitle" class="form-control" placeholder="Tên bài hát..."></div>
+                                        <div class="col-md-6"><input type="text" id="songComposer" class="form-control" placeholder="Tên tác giả..."></div>
+                                    </div>
+                                    <div class="row g-2 align-items-center">
+                                        <div class="col-md-10">
+                                            <label for="pdfFile" class="custom-file-upload" id="fileLabel"><i class="bi bi-file-earmark-pdf"></i> Chọn file PDF</label>
+                                            <input type="file" id="pdfFile" accept=".pdf" onchange="updateFileName()">
+                                        </div>
+                                        <div class="col-md-2"><button class="btn btn-danger w-100 p-2 h-100" onclick="uploadSong()"><i class="bi bi-cloud-plus-fill"></i></button></div>
+                                    </div>
+                                </div>
+                                <hr class="opacity-25">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6><i class="bi bi-magic me-2"></i>Gộp Ảnh sang PDF</h6>
+                                        <button class="btn btn-sm btn-reset text-white-50" onclick="resetAllImages()">Reset</button>
+                                    </div>
+                                    <div class="row g-2 align-items-center">
+                                        <div class="col-md-9">
+                                            <label for="imgToPdf" class="custom-file-upload" id="imgLabel"><i class="bi bi-images"></i> Chọn ảnh iPhone/Android</label>
+                                            <input type="file" id="imgToPdf" accept="image/*,.heic,.HEIC" multiple onchange="handleFileSelect()">
+                                        </div>
+                                        <div class="col-md-3"><button id="btnConvert" class="btn btn-info w-100 p-2 text-white fw-bold" onclick="generatePDF()">Gộp Ngay</button></div>
+                                    </div>
+                                    <div id="previewContainer" style="display: none;"></div>
+                                    <div id="pdfStatus" class="small mt-2 text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thêm data-tilt vào khung tìm kiếm -->
+                <div class="glass-card p-3 mb-4" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-transparent border-0 text-white opacity-50"><i class="bi bi-search"></i></span>
+                        <input type="text" id="searchInput" class="form-control bg-transparent border-0" placeholder="Tìm bài hát, tác giả..." oninput="filterSongs()">
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-center gap-1" id="alphabetContainer"></div>
+                </div>
+
+                <div id="musicList" class="list-group mb-5">
+                    <div class="text-center py-5"><div class="spinner-border text-light"></div></div>
+                </div>
+
+                <!-- KHUNG CHÍNH DIỄN: Hiệu ứng lấp lánh 3D cực xịn ở đây -->
+                <div class="glass-card p-5 text-center" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.3">
+                    <h4 class="dating-title mb-4">Our Love Story</h4>
+                    <div class="dating-container">
+                        <div class="avatar-box">
+                            <img src="dang.jpg" class="avatar" alt="Anh Đăng">
+                            <div class="avatar-name mt-2 fw-bold">Anh Đăng</div>
+                        </div>
+                        <div class="counter-box">
+                            <div class="heart-icon"><i class="bi bi-heart-fill"></i></div>
+                            <div id="daysCount" class="days-number">0</div>
+                            <div style="font-size: 0.7rem; opacity: 0.8; font-weight: 600;">NGÀY BÊN NHAU</div>
+                        </div>
+                        <div class="avatar-box">
+                            <img src="oanh.jpg" class="avatar" alt="Bé Oanh">
+                            <div class="avatar-name mt-2 fw-bold">Bé Oanh</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal giữ nguyên -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-card">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i>Chỉnh sửa bài hát</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editSongId">
+                    <div class="mb-3">
+                        <label class="form-label small opacity-75">Tên bài hát</label>
+                        <input type="text" id="editSongTitle" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small opacity-75">Tên tác giả</label>
+                        <input type="text" id="editSongComposer" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger px-4" onclick="updateSong()">Lưu thay đổi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const _URL = 'https://vvmivjmgepmosdwkiagb.supabase.co';
+        const _KEY = 'sb_publishable_f9No0YOA6vmNDJwdE_GG3w_gtKXbIcF';
+        const _supabase = supabase.createClient(_URL, _KEY);
+        const startDate = new Date('2024-05-21');
+
+        let allSongs = [];
+        let filteredSongs = [];
+        let currentPage = 1;
+        const pageSize = 10;
+        let editModalObj;
+        let currentLetterFilter = '';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            editModalObj = new bootstrap.Modal(document.getElementById('editModal'));
+            loadSongs();
+            createHearts();
+            renderAlphabet();
+            document.getElementById('daysCount').innerText = Math.ceil(Math.abs(new Date() - startDate) / (1000 * 60 * 60 * 24));
+
+            // Khởi chạy hiệu ứng VanillaTilt cho 3D
+            VanillaTilt.init(document.querySelectorAll("[data-tilt]"));
+        });
+
+        function renderAlphabet() {
+            const container = document.getElementById('alphabetContainer');
+            const chars = ['#', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+            container.innerHTML = chars.map(c =>
+                `<div class="alpha-btn" onclick="setLetterFilter('${c}')" id="btn-${c === '#' ? 'num' : c}">${c}</div>`
+            ).join('');
+        }
+
+        function setLetterFilter(letter) {
+            if (currentLetterFilter === letter) {
+                currentLetterFilter = '';
+            } else {
+                currentLetterFilter = letter;
+            }
+            document.querySelectorAll('.alpha-btn').forEach(btn => btn.classList.remove('active'));
+            if (currentLetterFilter) {
+                const activeBtn = document.getElementById(`btn-${letter === '#' ? 'num' : letter}`);
+                if (activeBtn) activeBtn.classList.add('active');
+            }
+            filterSongs();
+        }
+
+        async function loadSongs() {
+            const { data, error } = await _supabase.from('song').select('*');
+            if (error) return;
+            allSongs = data || [];
+            allSongs.sort((a, b) => a.ten_nhac.localeCompare(b.ten_nhac, 'vi'));
+            filteredSongs = [...allSongs];
+            renderList();
+        }
+
+        function renderList() {
+            const list = document.getElementById('musicList');
+            const start = (currentPage - 1) * pageSize;
+            const items = filteredSongs.slice(start, start + pageSize);
+
+            if (filteredSongs.length === 0) {
+                list.innerHTML = `<div class="text-center opacity-50 mt-5">Chưa có bài hát nào... ❤️</div>`;
+                return;
+            }
+
+            let html = items.map(song => `
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="flex-grow-1">
+                                    <a href="${song.pdf_url}" target="_blank" class="song-link">
+                                        <i class="bi bi-music-note-beamed me-2 text-danger"></i> ${song.ten_nhac}
+                                    </a>
+                                    <span class="composer-name">${song.tac_gia || 'Không rõ tác giả'}</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-pencil-square action-icon edit-icon" onclick="openEditModal(${song.id}, '${song.ten_nhac.replace(/'/g, "\\'")}', '${(song.tac_gia || "").replace(/'/g, "\\'")}')"></i>
+                                    <i class="bi bi-trash3 action-icon delete-icon" onclick="deleteSong(${song.id}, '${song.pdf_url}')"></i>
+                                </div>
+                            </div>`).join('');
+
+            const totalPages = Math.ceil(filteredSongs.length / pageSize);
+            if (totalPages > 1) {
+                html += `
+                                <div class="pagination-container">
+                                    <button class="btn-page" onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}><i class="bi bi-chevron-left"></i></button>
+                                    <span class="small opacity-75">Trang ${currentPage} / ${totalPages}</span>
+                                    <button class="btn-page" onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}><i class="bi bi-chevron-right"></i></button>
+                                </div>`;
+            }
+            list.innerHTML = html;
+        }
+
+        function openEditModal(id, title, composer) {
+            document.getElementById('editSongId').value = id;
+            document.getElementById('editSongTitle').value = title;
+            document.getElementById('editSongComposer').value = composer;
+            editModalObj.show();
+        }
+
+        async function updateSong() {
+            const id = document.getElementById('editSongId').value;
+            const newTitle = document.getElementById('editSongTitle').value.trim();
+            const newComposer = document.getElementById('editSongComposer').value.trim();
+
+            if (!newTitle) return alert("Vui lòng nhập tên bài hát!");
+
+            const { error } = await _supabase
+                .from('song')
+                .update({ ten_nhac: newTitle, tac_gia: newComposer })
+                .eq('id', id);
+
+            if (error) {
+                console.error("Supabase Error Details:", error);
+                alert("Lỗi: " + error.message);
+            } else {
+                editModalObj.hide();
+                loadSongs();
+            }
+        }
+
+        function changePage(step) { currentPage += step; renderList(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        function filterSongs() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+
+            filteredSongs = allSongs.filter(s => {
+                const matchSearch = s.ten_nhac.toLowerCase().includes(query) ||
+                    (s.tac_gia && s.tac_gia.toLowerCase().includes(query));
+
+                let matchLetter = true;
+                if (currentLetterFilter) {
+                    const firstChar = s.ten_nhac.trim().charAt(0).toUpperCase();
+                    if (currentLetterFilter === '#') {
+                        matchLetter = /^[0-9]/.test(firstChar);
+                    } else {
+                        const normalizedChar = firstChar.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/Đ/g, "D").replace(/đ/g, "d");
+                        matchLetter = normalizedChar === currentLetterFilter;
+                    }
+                }
+
+                return matchSearch && matchLetter;
+            });
+
+            currentPage = 1;
+            renderList();
+        }
+
+        const previewContainer = document.getElementById('previewContainer');
+        Sortable.create(previewContainer, { animation: 150, onEnd: updateBadges });
+
+        function updateBadges() {
+            const items = previewContainer.querySelectorAll('.preview-item');
+            items.forEach((item, index) => { item.querySelector('.preview-badge').innerText = index + 1; });
+            document.getElementById('imgLabel').innerHTML = `<i class="bi bi-check-all text-success"></i> Đã chọn ${items.length} ảnh`;
+        }
+
+        function handleFileSelect() {
+            const files = Array.from(document.getElementById('imgToPdf').files);
+            if (files.length === 0) return;
+            previewContainer.style.display = "grid";
+            files.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })).forEach((file) => {
+                const item = document.createElement('div');
+                item.className = 'preview-item';
+                item.fileObject = file;
+                let imgSrc = "https://placehold.co/100x120?text=HEIC";
+                if (!file.name.toLowerCase().endsWith(".heic")) imgSrc = URL.createObjectURL(file);
+                item.innerHTML = `<div class="preview-badge">0</div><div class="remove-btn" onclick="this.parentElement.remove();updateBadges();"><i class="bi bi-x"></i></div><img src="${imgSrc}"><p style="font-size:8px; margin:5px 0 0 0; overflow:hidden; white-space:nowrap; opacity:0.7;">${file.name}</p>`;
+                previewContainer.appendChild(item);
+            });
+            updateBadges();
+        }
+
+        async function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const items = Array.from(previewContainer.querySelectorAll('.preview-item'));
+            if (items.length === 0) return alert('Chọn ảnh nhen Oanh!');
+            const status = document.getElementById('pdfStatus');
+            status.innerHTML = "Đang xử lý thông minh... ⏳";
+            try {
+                let pdf;
+                for (let i = 0; i < items.length; i++) {
+                    let file = items[i].fileObject;
+                    if (file.name.toLowerCase().endsWith(".heic")) {
+                        const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.8 });
+                        file = Array.isArray(blob) ? blob[0] : blob;
+                    }
+                    const imgData = await new Promise(r => { const reader = new FileReader(); reader.onload = e => r(e.target.result); reader.readAsDataURL(file); });
+                    const img = new Image();
+                    await new Promise(r => { img.onload = r; img.src = imgData; });
+                    const orientation = img.width > img.height ? 'l' : 'p';
+                    if (i === 0) pdf = new jsPDF({ orientation: orientation, unit: 'mm', format: 'a4' });
+                    else pdf.addPage('a4', orientation);
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const imgRatio = img.width / img.height;
+                    const pageRatio = pageWidth / pageHeight;
+                    let finalW, finalH;
+                    if (imgRatio > pageRatio) { finalW = pageWidth; finalH = pageWidth / imgRatio; }
+                    else { finalH = pageHeight; finalW = pageHeight * imgRatio; }
+                    pdf.addImage(imgData, 'JPEG', (pageWidth - finalW) / 2, (pageHeight - finalH) / 2, finalW, finalH);
+                }
+                pdf.save(`Nhac_Oanh_${Date.now()}.pdf`);
+                status.innerHTML = "✅ Xong rồi, đẹp lung linh!";
+            } catch (e) { alert("Lỗi gộp file rồi Đăng ơi!"); }
+        }
+
+        function resetAllImages() { previewContainer.innerHTML = ""; previewContainer.style.display = "none"; document.getElementById('imgLabel').innerHTML = `<i class="bi bi-images"></i> Chọn ảnh iPhone/Android`; }
+
+        function createHearts() {
+            const bg = document.getElementById('heartBg');
+            setInterval(() => {
+                const heart = document.createElement('i');
+                heart.className = `floating-heart bi bi-heart-fill`;
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.fontSize = (Math.random() * 15 + 10) + 'px';
+                bg.appendChild(heart);
+                setTimeout(() => heart.remove(), 15000);
+            }, 1000);
+        }
+
+        async function uploadSong() {
+            const ten = document.getElementById('songTitle').value.trim();
+            const tacgia = document.getElementById('songComposer').value.trim();
+            const file = document.getElementById('pdfFile').files[0];
+            if (!ten || !file) return alert('Nhập tên bài hát và chọn file nhen Oanh!');
+            const fileName = `${Date.now()}_${file.name}`;
+            const { data } = await _supabase.storage.from('pdfs').upload(fileName, file);
+            if (data) {
+                const { data: url } = _supabase.storage.from('pdfs').getPublicUrl(fileName);
+                await _supabase.from('song').insert([{ ten_nhac: ten, tac_gia: tacgia, pdf_url: url.publicUrl }]);
+                location.reload();
+            }
+        }
+
+        async function deleteSong(id, url) {
+            if (!confirm('Xóa bài hát này nhen?')) return;
+            const fileName = url.split('/').pop();
+            await _supabase.storage.from('pdfs').remove([fileName]);
+            await _supabase.from('song').delete().eq('id', id);
+            location.reload();
+        }
+
+        function updateFileName() { const input = document.getElementById('pdfFile'); if (input.files.length > 0) document.getElementById('fileLabel').innerHTML = input.files[0].name; }
     </script>
 </body>
 </html>
